@@ -39,12 +39,12 @@ public class Player {
     }
 
     public void printPlayerResources() {
-        System.out.println("You currently have: ");
-        System.out.println(Resource.BRICK + playerResources.get(Resource.BRICK).toString());
-        System.out.println(Resource.WOOD + playerResources.get(Resource.WOOD).toString());
-        System.out.println(Resource.SHEEP + playerResources.get(Resource.SHEEP).toString());
-        System.out.println(Resource.GRAIN + playerResources.get(Resource.GRAIN).toString());
-        System.out.println(Resource.STONE + playerResources.get(Resource.STONE).toString());
+        System.out.println("Player " + this.username + ": You currently have: ");
+        System.out.println(Resource.BRICK + " " + playerResources.get(Resource.BRICK).toString());
+        System.out.println(Resource.WOOD + " " + playerResources.get(Resource.WOOD).toString());
+        System.out.println(Resource.SHEEP + " " + playerResources.get(Resource.SHEEP).toString());
+        System.out.println(Resource.GRAIN + " " + playerResources.get(Resource.GRAIN).toString());
+        System.out.println(Resource.STONE + " " + playerResources.get(Resource.STONE).toString());
     }
 
     public void returnNumberOfPlayerHouses() {
