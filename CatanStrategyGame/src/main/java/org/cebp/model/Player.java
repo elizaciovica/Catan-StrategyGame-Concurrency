@@ -2,6 +2,8 @@ package org.cebp.model;
 
 import java.util.HashMap;
 
+import static org.cebp.model.Game.commonResources;
+
 public class Player {
     private String username;
     private HashMap<Resource, Integer> playerResources;
@@ -45,6 +47,15 @@ public class Player {
         System.out.println(Resource.SHEEP + " " + playerResources.get(Resource.SHEEP).toString());
         System.out.println(Resource.GRAIN + " " + playerResources.get(Resource.GRAIN).toString());
         System.out.println(Resource.STONE + " " + playerResources.get(Resource.STONE).toString());
+    }
+
+    public void printCommonResources() {
+        System.out.println("Currently, there are available the following resources: ");
+        System.out.println(Resource.BRICK + " " + commonResources.get(Resource.BRICK).toString());
+        System.out.println(Resource.WOOD + " " + commonResources.get(Resource.WOOD).toString());
+        System.out.println(Resource.SHEEP + " " + commonResources.get(Resource.SHEEP).toString());
+        System.out.println(Resource.GRAIN + " " + commonResources.get(Resource.GRAIN).toString());
+        System.out.println(Resource.STONE + " " + commonResources.get(Resource.STONE).toString());
     }
 
     public void returnNumberOfPlayerHouses() {

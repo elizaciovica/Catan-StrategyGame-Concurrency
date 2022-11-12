@@ -12,12 +12,14 @@ public class Main {
         Player player2 = new Player("slytherinUser");
         game.showGameRules();
         game.initializeUsers();
+        game.initializeCommonResources();
         try {
             game.loginUser(player1);
             game.loginUser(player2);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        player1.printCommonResources();
 
     }
 }

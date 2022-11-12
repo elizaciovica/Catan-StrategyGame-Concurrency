@@ -2,10 +2,12 @@ package org.cebp.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Game {
 
     public static final ArrayList<String> gameUsers = new ArrayList<>();
+    public static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
 
     public Game() {
 
@@ -27,6 +29,14 @@ public class Game {
         gameUsers.add("hufflepuffUser");
         gameUsers.add("ravenclawUser");
         gameUsers.add("slytherinUser");
+    }
+
+    public void initializeCommonResources() {
+        commonResources.put(Resource.BRICK, 2);
+        commonResources.put(Resource.WOOD, 3);
+        commonResources.put(Resource.SHEEP, 1);
+        commonResources.put(Resource.GRAIN, 1);
+        commonResources.put(Resource.STONE, 2);
     }
 
     public void loginUser(Player player) throws IOException {
