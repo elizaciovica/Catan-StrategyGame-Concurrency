@@ -13,6 +13,10 @@ public class Game {
 
     }
 
+    public HashMap<Resource, Integer> getCommonResources() {
+        return commonResources;
+    }
+
     public void showGameRules() {
         System.out.println("Welcome to Catan!");
         System.out.println("The goal of this game is to reach 10 points. The player who reaches first 10 points wins!");
@@ -51,6 +55,5 @@ public class Game {
             System.out.println("Login successfully");
             player.printPlayerResources();
         }
-
     }
 }

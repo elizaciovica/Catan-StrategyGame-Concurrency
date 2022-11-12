@@ -1,6 +1,7 @@
 package org.cebp;
 
 import org.cebp.model.Game;
+import org.cebp.model.House;
 import org.cebp.model.Player;
 
 import java.io.IOException;
@@ -19,7 +20,28 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        player1.printCommonResources();
+        //player1.printCommonResources();
+        //house.createHouse(player1);
+        //player1.printPlayerResources();
+        //player1.printCommonResources();
 
+        //this can cause thread interference and memory inconsistency
+        Thread thread1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                player2.printCommonResources();
+            }
+        });
+
+        Thread thread2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                House house = new House();
+                house.createHouse(player1);
+            }
+        });
+
+        thread1.start();
+        thread2.start();
     }
 }
