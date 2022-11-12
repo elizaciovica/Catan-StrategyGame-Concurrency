@@ -2,6 +2,8 @@ package org.cebp.model;
 
 import java.util.HashMap;
 
+import static org.cebp.model.Game.commonResources;
+
 public class Player {
     private String username;
     private HashMap<Resource, Integer> playerResources;
@@ -38,13 +40,47 @@ public class Player {
         this.playerResources = playerResources;
     }
 
+    public void setHouses(int houses) {
+        this.houses = houses;
+    }
+
+    public void setCities(int cities) {
+        this.cities = cities;
+    }
+
+    public void increaseNoOfHouses() {
+        this.houses += 1;
+    }
+
+    public void increaseNoOfCities() {
+        this.cities += 1;
+    }
+
     public void printPlayerResources() {
-        System.out.println("You currently have: ");
-        System.out.println(Resource.BRICK + playerResources.get(Resource.BRICK).toString());
-        System.out.println(Resource.WOOD + playerResources.get(Resource.WOOD).toString());
-        System.out.println(Resource.SHEEP + playerResources.get(Resource.SHEEP).toString());
-        System.out.println(Resource.GRAIN + playerResources.get(Resource.GRAIN).toString());
-        System.out.println(Resource.STONE + playerResources.get(Resource.STONE).toString());
+        System.out.println("Player " + this.username + ": You currently have: ");
+        System.out.println(Resource.BRICK + " " + playerResources.get(Resource.BRICK).toString());
+        System.out.println(Resource.WOOD + " " + playerResources.get(Resource.WOOD).toString());
+        System.out.println(Resource.SHEEP + " " + playerResources.get(Resource.SHEEP).toString());
+        System.out.println(Resource.GRAIN + " " + playerResources.get(Resource.GRAIN).toString());
+        System.out.println(Resource.STONE + " " + playerResources.get(Resource.STONE).toString());
+    }
+
+    public void printCommonResources() {
+        synchronized (this) {
+            System.out.println("Currently, there are available the following resources: ");
+            System.out.println(Resource.BRICK + " " + commonResources.get(Resource.BRICK).toString());
+            System.out.println(Resource.WOOD + " " + commonResources.get(Resource.WOOD).toString());
+            System.out.println(Resource.SHEEP + " " + commonResources.get(Resource.SHEEP).toString());
+            System.out.println(Resource.GRAIN + " " + commonResources.get(Resource.GRAIN).toString());
+            System.out.println(Resource.STONE + " " + commonResources.get(Resource.STONE).toString());
+            try {
+                wait(5000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                System.err.println("Thread Interrupted");
+            }
+            notifyAll();
+        }
     }
 
     public void returnNumberOfPlayerHouses() {
