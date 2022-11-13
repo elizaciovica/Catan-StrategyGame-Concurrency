@@ -17,12 +17,14 @@ public class City {
         if(playerResources != null) {
             if (playerResources.get(Resource.GRAIN) < 2 || playerResources.get(Resource.STONE) < 3) {
                 System.out.println("You don't have enough resources. Please check your resources.");
+                System.out.println();
                 //to be implemented => if the player doesn't have enough resources,
                 // he will be redirected to the menu actions
             } else {
                 removeResourcesInExchangeForCity(playerResources, commonResources);
                 currentPlayer.increaseNoOfCities();
                 System.out.println("City created succesfully!");
+                System.out.println();
             }
         } else {
             exit(0);

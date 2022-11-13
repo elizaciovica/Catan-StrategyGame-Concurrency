@@ -63,22 +63,24 @@ public class Player {
         System.out.println(Resource.SHEEP + " " + playerResources.get(Resource.SHEEP).toString());
         System.out.println(Resource.GRAIN + " " + playerResources.get(Resource.GRAIN).toString());
         System.out.println(Resource.STONE + " " + playerResources.get(Resource.STONE).toString());
+        System.out.println();
     }
 
     public void printCommonResources() {
         synchronized (this) {
+            try {
+                wait(500);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                System.err.println("Thread Interrupted");
+            }
             System.out.println("Currently, there are available the following resources: ");
             System.out.println(Resource.BRICK + " " + commonResources.get(Resource.BRICK).toString());
             System.out.println(Resource.WOOD + " " + commonResources.get(Resource.WOOD).toString());
             System.out.println(Resource.SHEEP + " " + commonResources.get(Resource.SHEEP).toString());
             System.out.println(Resource.GRAIN + " " + commonResources.get(Resource.GRAIN).toString());
             System.out.println(Resource.STONE + " " + commonResources.get(Resource.STONE).toString());
-            try {
-                wait(5000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                System.err.println("Thread Interrupted");
-            }
+            System.out.println();
             notifyAll();
         }
     }
