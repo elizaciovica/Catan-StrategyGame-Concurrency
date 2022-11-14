@@ -8,19 +8,12 @@ public class Game {
 
     public static final ArrayList<String> gameUsers = new ArrayList<>();
 
-    public static ArrayList<Player> getCurrentPlayers() {
-        return currentPlayers;
-    }
+    private static ArrayList<Player> currentPlayers = new ArrayList<>();
 
-    public static ArrayList<Player> currentPlayers = new ArrayList<>();
-    public static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
+    private static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
 
     public Game() {
 
-    }
-
-    public HashMap<Resource, Integer> getCommonResources() {
-        return commonResources;
     }
 
     public void showGameRules() {
@@ -62,5 +55,21 @@ public class Game {
             System.out.println();
             player.printPlayerResources();
         }
+    }
+
+    public static void confirmExchange(Player currentPlayer) {
+        currentPlayers.forEach(player -> {
+            if (!currentPlayer.equals(player)) {
+                //todo
+            }
+        });
+    }
+
+    public static HashMap<Resource, Integer> getCommonResources() {
+        return commonResources;
+    }
+
+    public static ArrayList<Player> getCurrentPlayers() {
+        return currentPlayers;
     }
 }

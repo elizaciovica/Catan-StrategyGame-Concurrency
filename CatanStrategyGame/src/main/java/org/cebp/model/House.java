@@ -12,8 +12,7 @@ public class House {
 
     public void createHouse(Player currentPlayer) {
         HashMap<Resource, Integer> playerResources = currentPlayer.getPlayerResources();
-        Game game = new Game();
-        HashMap<Resource, Integer> commonResources = game.getCommonResources();
+        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
         if (playerResources != null) {
             if (playerResources.get(Resource.BRICK) < 1
                     || playerResources.get(Resource.WOOD) < 1
