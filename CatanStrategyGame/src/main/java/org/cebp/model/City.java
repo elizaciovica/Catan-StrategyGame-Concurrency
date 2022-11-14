@@ -12,8 +12,7 @@ public class City {
 
     public void createCity(Player currentPlayer) {
         HashMap<Resource, Integer> playerResources = currentPlayer.getPlayerResources();
-        Game game = new Game();
-        HashMap<Resource, Integer> commonResources = game.getCommonResources();
+        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
         if(playerResources != null) {
             if (playerResources.get(Resource.GRAIN) < 2 || playerResources.get(Resource.STONE) < 3) {
                 System.out.println("You don't have enough resources. Please check your resources.");

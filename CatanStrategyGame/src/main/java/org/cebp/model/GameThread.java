@@ -56,7 +56,6 @@ public class GameThread extends Thread {
             }
             System.out.println(threadName + " releases the permit.");
             sem.release();
-
         }
     }
 }

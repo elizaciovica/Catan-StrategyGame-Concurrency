@@ -12,8 +12,7 @@ public class WantedResource {
 
     public void createResource(Player currentPlayer, Resource wantedResource) {
         HashMap<Resource, Integer> playerResources = currentPlayer.getPlayerResources();
-        Game game = new Game();
-        HashMap<Resource, Integer> commonResources = game.getCommonResources();
+        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
         if(playerResources != null) {
             if (playerResources.get(Resource.SHEEP) < 1
                     || playerResources.get(Resource.GRAIN) < 1
