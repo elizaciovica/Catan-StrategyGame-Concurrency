@@ -7,6 +7,12 @@ import java.util.HashMap;
 public class Game {
 
     public static final ArrayList<String> gameUsers = new ArrayList<>();
+
+    public static ArrayList<Player> getCurrentPlayers() {
+        return currentPlayers;
+    }
+
+    public static ArrayList<Player> currentPlayers = new ArrayList<>();
     public static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
 
     public Game() {
@@ -26,6 +32,7 @@ public class Game {
         System.out.println("1 city = 2 grains + 3 stones.");
         System.out.println("1 resource of your choice = 1 sheep + 1 grain + 1 stone.");
         System.out.println("You can also exchange resources between you.");
+        System.out.println("\n\n");
     }
 
     public void initializeUsers() {
@@ -44,7 +51,6 @@ public class Game {
     }
 
     public void loginUser(Player player) throws IOException {
-        ArrayList<Player> currentPlayers = new ArrayList<>();
         System.out.println("LOGIN: Enter username");
         System.out.println(player.getUsername());
         if (!gameUsers.contains(player.getUsername()) || player.getUsername() == null || player.getUsername().isEmpty()) {
@@ -53,6 +59,7 @@ public class Game {
             currentPlayers.add(player);
             player.assignInitialResources(2, 2, 2, 2, 2);
             System.out.println("Login successfully");
+            System.out.println();
             player.printPlayerResources();
         }
     }
