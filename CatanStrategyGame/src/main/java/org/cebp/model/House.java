@@ -27,6 +27,7 @@ public class House {
             } else {
                 removeResourcesInExchangeForHouse(playerResources, commonResources);
                 currentPlayer.increaseNoOfHouses();
+                currentPlayer.increasePointsForHouse();
                 System.out.println("House created succesfully!");
                 System.out.println();
             }

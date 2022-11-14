@@ -23,6 +23,7 @@ public class City {
             } else {
                 removeResourcesInExchangeForCity(playerResources, commonResources);
                 currentPlayer.increaseNoOfCities();
+                currentPlayer.increasePointsForCity();
                 System.out.println("City created succesfully!");
                 System.out.println();
             }

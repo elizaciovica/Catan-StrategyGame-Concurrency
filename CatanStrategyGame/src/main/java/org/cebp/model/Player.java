@@ -1,7 +1,9 @@
 package org.cebp.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import static java.lang.System.exit;
 import static org.cebp.model.Game.commonResources;
 
 public class Player {
@@ -10,6 +12,8 @@ public class Player {
 
     private int houses;
     private int cities;
+
+    private int points;
 
     public Player(String username) {
         this.username = username;
@@ -56,6 +60,14 @@ public class Player {
         this.cities += 1;
     }
 
+    public void increasePointsForHouse() {
+        this.points += 1;
+    }
+
+    public void increasePointsForCity() {
+        this.points += 2;
+    }
+
     public void printPlayerResources() {
         System.out.println("Player " + this.username + ": You currently have: ");
         System.out.println(Resource.BRICK + " " + playerResources.get(Resource.BRICK).toString());
@@ -94,7 +106,94 @@ public class Player {
     }
 
     //we want to make the resource for exchange of player visible for a possible match
-    public void setPlayerOpenToExchange(HashMap<Resource, Integer> playerResources) {
-        // ???
+    public void setPlayerOpenToExchange(HashMap<Resource, Integer> playerExchangedResources,
+                                        HashMap<Resource, Integer> playerWantedResource,
+                                        Resource wantedResource) {
+
+        ExchangedResource exchangedResource = new ExchangedResource(playerExchangedResources, playerWantedResource);
+        exchangedResource.initializePlayerResourceToExchange();
+        exchangedResource.initializePlayerWantedResource();
+
+        if (playerResources != null) {
+            switch (wantedResource) {
+                case BRICK:
+                    if (playerResources.get(Resource.BRICK) > 0) {
+                        playerResources.put(Resource.BRICK, playerResources.get(Resource.BRICK) - 1);
+                        exchangedResource.getPlayerResourceToExchange()
+                                .put(Resource.BRICK, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.BRICK) + 1);
+                        exchangedResource.getPlayerWantedResource()
+                                .put(Resource.BRICK, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.BRICK) + 1);
+                        System.out.println("Exchanged Resource set!");
+                    } else {
+                        System.out.println("You don't have any more bricks available.");
+                        exit(0);
+                    }
+                case WOOD:
+                    if (playerResources.get(Resource.WOOD) > 0) {
+                        playerResources.put(Resource.WOOD, playerResources.get(Resource.WOOD) - 1);
+                        exchangedResource.getPlayerResourceToExchange()
+                                .put(Resource.WOOD, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.WOOD) + 1);
+                        exchangedResource.getPlayerWantedResource()
+                                .put(Resource.WOOD, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.WOOD) + 1);
+                        System.out.println("Exchanged Resource set!");
+                    } else {
+                        System.out.println("You don't have any more wood available.");
+                        exit(0);
+                    }
+                case SHEEP:
+                    if (playerResources.get(Resource.SHEEP) > 0) {
+                        playerResources.put(Resource.SHEEP, playerResources.get(Resource.SHEEP) - 1);
+                        exchangedResource.getPlayerResourceToExchange()
+                                .put(Resource.SHEEP, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.SHEEP) + 1);
+                        exchangedResource.getPlayerWantedResource()
+                                .put(Resource.SHEEP, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.SHEEP) + 1);
+                        System.out.println("Exchanged Resource set!");
+                    } else {
+                        System.out.println("You don't have any more sheep available.");
+                        exit(0);
+                    }
+                case GRAIN:
+                    if (playerResources.get(Resource.GRAIN) > 0) {
+                        playerResources.put(Resource.GRAIN, playerResources.get(Resource.GRAIN) - 1);
+                        exchangedResource.getPlayerResourceToExchange()
+                                .put(Resource.GRAIN, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.GRAIN) + 1);
+                        exchangedResource.getPlayerWantedResource()
+                                .put(Resource.GRAIN, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.GRAIN) + 1);
+                        System.out.println("Exchanged Resource set!");
+                    } else {
+                        System.out.println("You don't have any more grain available.");
+                        exit(0);
+                    }
+                case STONE:
+                    if (playerResources.get(Resource.STONE) > 0) {
+                        playerResources.put(Resource.STONE, playerResources.get(Resource.STONE) - 1);
+                        exchangedResource.getPlayerResourceToExchange()
+                                .put(Resource.STONE, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.STONE) + 1);
+                        exchangedResource.getPlayerWantedResource()
+                                .put(Resource.STONE, exchangedResource.getPlayerResourceToExchange()
+                                        .get(Resource.STONE) + 1);
+                        System.out.println("Exchanged Resource set!");
+                    } else {
+                        System.out.println("You don't have any more stones available.");
+                        exit(0);
+                    }
+            }
+        }
+    }
+
+    public void confirmExchange(ExchangedResource exchangedResource, Player currentPlayer) {
+        ArrayList currentPlayers = Game.getCurrentPlayers();
+        for(int i = 0; i < currentPlayers.size(); i++) {
+            //todo
+        }
     }
 }
