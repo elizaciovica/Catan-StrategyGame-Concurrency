@@ -15,9 +15,9 @@ public class Player {
 
     private HashMap<Resource, Integer> playerResources;
 
-    private HashMap<Resource, Integer> playerResourceToExchange;
+    private Resource playerResourceToExchange;
 
-    private HashMap<Resource, Integer> playerWantedResource;
+    private Resource playerWantedResource;
 
     public Player(String username) {
         this.username = username;
@@ -50,11 +50,11 @@ public class Player {
 
     public void printPlayerResources() {
         System.out.println("Player " + this.username + ": You currently have: ");
-        System.out.println(Resource.BRICK + " " + playerResources.get(Resource.BRICK).toString());
-        System.out.println(Resource.WOOD + " " + playerResources.get(Resource.WOOD).toString());
-        System.out.println(Resource.SHEEP + " " + playerResources.get(Resource.SHEEP).toString());
-        System.out.println(Resource.GRAIN + " " + playerResources.get(Resource.GRAIN).toString());
-        System.out.println(Resource.STONE + " " + playerResources.get(Resource.STONE).toString());
+        System.out.println(Resource.BRICK + " " + this.playerResources.get(Resource.BRICK).toString());
+        System.out.println(Resource.WOOD + " " + this.playerResources.get(Resource.WOOD).toString());
+        System.out.println(Resource.SHEEP + " " + this.playerResources.get(Resource.SHEEP).toString());
+        System.out.println(Resource.GRAIN + " " + this.playerResources.get(Resource.GRAIN).toString());
+        System.out.println(Resource.STONE + " " + this.playerResources.get(Resource.STONE).toString());
         System.out.println();
     }
 
@@ -85,113 +85,89 @@ public class Player {
         System.out.println("You currently have " + this.cities + " cities");
     }
 
-    public void initializePlayerResourceToExchange() {
-        playerResourceToExchange = new HashMap<Resource, Integer>();
-        playerResourceToExchange.put(Resource.BRICK, 0);
-        playerResourceToExchange.put(Resource.WOOD, 0);
-        playerResourceToExchange.put(Resource.SHEEP, 0);
-        playerResourceToExchange.put(Resource.GRAIN, 0);
-        playerResourceToExchange.put(Resource.STONE, 0);
-    }
-
-    public void initializePlayerWantedResource() {
-        playerWantedResource = new HashMap<Resource, Integer>();
-        playerWantedResource.put(Resource.BRICK, 0);
-        playerWantedResource.put(Resource.WOOD, 0);
-        playerWantedResource.put(Resource.SHEEP, 0);
-        playerWantedResource.put(Resource.GRAIN, 0);
-        playerWantedResource.put(Resource.STONE, 0);
-    }
 
     //we want to make the resource for exchange of player visible for a possible match
     public void setPlayerOpenToExchange(Resource toExchangeResource, Resource wantedResource) {
-
-        initializePlayerResourceToExchange();
-        initializePlayerWantedResource();
 
         if (playerResources != null) {
             switch (toExchangeResource) {
                 case BRICK:
                     if (playerResources.get(Resource.BRICK) > 0) {
                         playerResources.put(Resource.BRICK, playerResources.get(Resource.BRICK) - 1);
-                        playerResourceToExchange.put(Resource.BRICK,
-                                playerResourceToExchange.get(Resource.BRICK) + 1);
+                        playerResourceToExchange = Resource.BRICK;
                         System.out.println("Exchanged Resource set!");
                     } else {
                         System.out.println("You don't have any more bricks available.");
                         exit(0);
                     }
+                    break;
                 case WOOD:
                     if (playerResources.get(Resource.WOOD) > 0) {
                         playerResources.put(Resource.WOOD, playerResources.get(Resource.WOOD) - 1);
-                        playerResourceToExchange.put(Resource.WOOD,
-                                playerResourceToExchange.get(Resource.WOOD) + 1);
+                        playerResourceToExchange = Resource.WOOD;
                         System.out.println("Exchanged Resource set!");
                     } else {
                         System.out.println("You don't have any more wood available.");
                         exit(0);
                     }
+                    break;
                 case SHEEP:
                     if (playerResources.get(Resource.SHEEP) > 0) {
                         playerResources.put(Resource.SHEEP, playerResources.get(Resource.SHEEP) - 1);
-                        playerResourceToExchange.put(Resource.SHEEP,
-                                playerResourceToExchange.get(Resource.SHEEP) + 1);
+                        playerResourceToExchange = Resource.SHEEP;
                         System.out.println("Exchanged Resource set!");
                     } else {
                         System.out.println("You don't have any more sheep available.");
                         exit(0);
                     }
+                    break;
                 case GRAIN:
                     if (playerResources.get(Resource.GRAIN) > 0) {
                         playerResources.put(Resource.GRAIN, playerResources.get(Resource.GRAIN) - 1);
-                        playerResourceToExchange.put(Resource.GRAIN,
-                                playerResourceToExchange.get(Resource.GRAIN) + 1);
+                        playerResourceToExchange = Resource.GRAIN;
                         System.out.println("Exchanged Resource set!");
                     } else {
                         System.out.println("You don't have any more grain available.");
                         exit(0);
                     }
+                    break;
                 case STONE:
                     if (playerResources.get(Resource.STONE) > 0) {
                         playerResources.put(Resource.STONE, playerResources.get(Resource.STONE) - 1);
-                        playerResourceToExchange.put(Resource.STONE,
-                                playerResourceToExchange.get(Resource.STONE) + 1);
+                        playerResourceToExchange = Resource.STONE;
                         System.out.println("Exchanged Resource set!");
                     } else {
                         System.out.println("You don't have any more stones available.");
                         exit(0);
                     }
+                    break;
             }
 
             switch (wantedResource) {
                 case BRICK:
-                    playerWantedResource.put(Resource.BRICK,
-                            playerWantedResource.get(Resource.BRICK) + 1);
+                    playerWantedResource = Resource.BRICK;
+                    break;
                 case WOOD:
-                    playerWantedResource
-                            .put(Resource.WOOD,
-                                    playerWantedResource.get(Resource.WOOD) + 1);
+                    playerWantedResource = Resource.WOOD;
+                    break;
                 case SHEEP:
-                    playerWantedResource
-                            .put(Resource.SHEEP,
-                                    playerWantedResource.get(Resource.SHEEP) + 1);
+                    playerWantedResource = Resource.SHEEP;
+                    break;
                 case GRAIN:
-                    playerWantedResource
-                            .put(Resource.GRAIN,
-                                    playerWantedResource.get(Resource.GRAIN) + 1);
+                    playerWantedResource = Resource.GRAIN;
+                    break;
                 case STONE:
-                    playerWantedResource
-                            .put(Resource.STONE,
-                                    playerWantedResource.get(Resource.STONE) + 1);
+                    playerWantedResource = Resource.STONE;
+                    break;
             }
         }
     }
 
-    public HashMap<Resource, Integer> getPlayerResourceToExchange() {
+    public Resource getPlayerResourceToExchange() {
         return playerResourceToExchange;
     }
 
-    public HashMap<Resource, Integer> getPlayerWantedResource() {
+    public Resource getPlayerWantedResource() {
         return playerWantedResource;
     }
 

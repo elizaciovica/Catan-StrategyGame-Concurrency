@@ -57,10 +57,20 @@ public class Game {
         }
     }
 
-    public static void confirmExchange(Player currentPlayer) {
+    public static void confirmAndMadeExchange(Player currentPlayer) {
+        Resource resourceToExchange = currentPlayer.getPlayerResourceToExchange();
+        Resource wantedResource = currentPlayer.getPlayerWantedResource();
         currentPlayers.forEach(player -> {
             if (!currentPlayer.equals(player)) {
-                //todo
+                //if the resource the player wants to give is equal to the resource the other player wants to get and
+                //if the resource the player wants to get is equal to the resource the other player wants to give
+                //then the exchange is made
+                if (wantedResource == player.getPlayerResourceToExchange()
+                    && resourceToExchange == player.getPlayerWantedResource()) {
+                    currentPlayer.getPlayerResources().put(wantedResource,
+                                                           currentPlayer.getPlayerResources().get(wantedResource) + 1);
+                    player.getPlayerResources().put(resourceToExchange, player.getPlayerResources().get(resourceToExchange) + 1);
+                }
             }
         });
     }
