@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import static java.lang.System.exit;
 
-public class Player {
+public class Player implements Runnable {
     private String username;
 
     private int houses;
@@ -195,4 +195,7 @@ public class Player {
         this.cities = cities;
     }
 
+    @Override public void run() {
+
+    }
 }

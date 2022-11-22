@@ -3,17 +3,35 @@ package org.cebp.model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
-public class Game {
+public class Game implements Runnable {
 
     public static final ArrayList<String> gameUsers = new ArrayList<>();
 
     private static ArrayList<Player> currentPlayers = new ArrayList<>();
 
     private static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
+    private Set<Player> players;
+    //
+    //    public void simulate() {
+    //        players.add(new Player("ravenclawUser"));
+    //        players.add(new Player("slytherinUser"));
+    //        players.add(new Player("hufflepuffUser"));
+    //
+    //        List<Player> list = new ArrayList<>(players);
+    //        int randIdx = new Random().nextInt(players.size());
+    //
+    //        Player randomPlayer = list.get(randIdx);
+    //        try {
+    //            this.loginUser(randomPlayer);
+    //        } catch (IOException e) {
+    //            throw new RuntimeException(e);
+    //        }
+    //    }
 
-    public Game() {
-
+    public Game(Set<Player> players) {
+        this.players = players;
     }
 
     public void showGameRules() {
@@ -53,7 +71,6 @@ public class Game {
             player.assignInitialResources(2, 2, 2, 2, 2);
             System.out.println("Login successfully");
             System.out.println();
-            player.printPlayerResources();
         }
     }
 
@@ -81,5 +98,17 @@ public class Game {
 
     public static ArrayList<Player> getCurrentPlayers() {
         return currentPlayers;
+    }
+
+    @Override public void run() {
+        for (Player player : players) {
+            try {
+                this.loginUser(player);
+            } catch (IOException e) {
+                throw new RuntimeException(e
+                );
+            }
+            player.printPlayerResources();
+        }
     }
 }
