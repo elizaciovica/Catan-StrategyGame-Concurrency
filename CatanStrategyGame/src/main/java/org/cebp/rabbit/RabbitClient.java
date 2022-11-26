@@ -58,7 +58,7 @@ public class RabbitClient {
 
 
 
-    private void publish(String exchangeName, String routingKey, RabbitMessage message) throws IOException {
+    private void publish(String exchangeName, String routingKey, Object message) throws IOException {
         serverChannel.basicPublish(exchangeName, routingKey, null, objectMapper.writeValueAsBytes(message));
     }
 
@@ -68,15 +68,15 @@ public class RabbitClient {
         serverChannel.queuePurge(username); // delete all messages from the queue so when restarting the app
     }
 
-    public void publishToClient(String playerName, RabbitMessage message) throws IOException {
+    public void publishToClient(String playerName, Object message) throws IOException {
         this.publish("client_exchange", playerName, message);
     }
 
-    public void publishToServer(RabbitMessage message) throws IOException {
+    public void publishToServer(Object message) throws IOException {
         this.publish("server_exchange", "", message);
     }
 
-    public void startConsume(String queueName, RabbitCallback callback) {
+    public void startConsume(String queueName, @SuppressWarnings("rawtypes") RabbitCallback callback, @SuppressWarnings("rawtypes") RabbitBodyDeserializer deserializer) {
         try {
             String consumerTag = serverChannel.basicConsume(queueName, true, new DeliverCallback() {
                 @Override
@@ -84,7 +84,8 @@ public class RabbitClient {
                     byte[] messageBytes = message.getBody();
                     // deserialize them in a rabbitMessage object
                     JsonNode node = objectMapper.readTree(messageBytes);
-                    callback.onMessage(new RabbitMessage(node.get("actionName").asText(), node.get("playerName").asText(), node.get("data")));
+                    //noinspection unchecked
+                    callback.onMessage(deserializer.deserialize(node));
                 }
             }, (consumer -> {
                 System.out.printf("Canceled consumer %s%n", consumer);

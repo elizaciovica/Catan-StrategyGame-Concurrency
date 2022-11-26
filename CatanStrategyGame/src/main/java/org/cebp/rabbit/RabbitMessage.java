@@ -2,14 +2,20 @@ package org.cebp.rabbit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.UUID;
+
 public class RabbitMessage {
+    /**
+     * acts as a message request, received by the server ***/
+    private String uuid;
     private String actionName;
     private String playerName;
-    private JsonNode messageData;
+    private JsonNode data;
 
-    public RabbitMessage(String actionName, String playerName, JsonNode messageData) {
+    public RabbitMessage(String actionName, String playerName, JsonNode data) {
+        this.uuid = UUID.randomUUID().toString();
         this.actionName = actionName;
-        this.messageData = messageData;
+        this.data = data;
         this.playerName = playerName;
     }
 
@@ -29,11 +35,29 @@ public class RabbitMessage {
         this.actionName = actionName;
     }
 
-    public JsonNode getMessageData() {
-        return messageData;
+    public JsonNode getData() {
+        return data;
     }
 
-    public void setMessageData(JsonNode messageData) {
-        this.messageData = messageData;
+    public void setData(JsonNode data) {
+        this.data = data;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    @Override
+    public String toString() {
+        return "RabbitMessage{" +
+                "uuid='" + uuid + '\'' +
+                ", actionName='" + actionName + '\'' +
+                ", playerName='" + playerName + '\'' +
+                ", data=" + data +
+                '}';
     }
 }
