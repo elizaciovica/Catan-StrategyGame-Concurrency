@@ -5,7 +5,7 @@ import java.util.HashMap;
 import static java.lang.System.exit;
 
 public class Player implements Runnable {
-    private String username;
+    private String username;    // used to identify players
 
     private int houses;
 

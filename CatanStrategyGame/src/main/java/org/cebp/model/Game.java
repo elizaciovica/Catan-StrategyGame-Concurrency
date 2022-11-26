@@ -1,5 +1,6 @@
 package org.cebp.model;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,6 +102,18 @@ public class Game implements Runnable {
     }
 
     @Override public void run() {
+        // while true,
+        // citesc mesaje de pe rabbit,
+        // folosesc factory sa construiesc iaction
+        // aplez execute action pt fiecare mesaj
+        // trimit raspuns la client
+
+//        Server server = new Server();
+//        server.serverStartProcessingMessages(message -> {
+//            IAction action = actonFactory.construct(message);
+//            action.executeAction();
+//        });
+        // while tru is running
         for (Player player : players) {
             try {
                 this.loginUser(player);
