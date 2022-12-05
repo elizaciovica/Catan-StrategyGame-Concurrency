@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import static java.lang.System.exit;
 
-public class Player implements Runnable {
+public class Player{
     private String username;    // used to identify players
 
     private int houses;
@@ -195,7 +195,4 @@ public class Player implements Runnable {
         this.cities = cities;
     }
 
-    @Override public void run() {
-
-    }
 }

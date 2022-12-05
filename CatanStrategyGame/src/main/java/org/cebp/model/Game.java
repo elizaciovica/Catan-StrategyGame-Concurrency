@@ -1,38 +1,35 @@
 package org.cebp.model;
 
+import org.cebp.messages.ActionFactory;
+import org.cebp.messages.ActionResult;
+import org.cebp.messages.IAction;
+import org.cebp.rabbit.RabbitCallback;
+import org.cebp.rabbit.RabbitClient;
+import org.cebp.rabbit.RabbitMessage;
+import org.cebp.rabbit.RabbitMessageDeserializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 public class Game implements Runnable {
 
-    public static final ArrayList<String> gameUsers = new ArrayList<>();
+    public final RabbitClient rabbitClient = new RabbitClient();
 
     private static ArrayList<Player> currentPlayers = new ArrayList<>();
 
     private static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
-    private Set<Player> players;
-    //
-    //    public void simulate() {
-    //        players.add(new Player("ravenclawUser"));
-    //        players.add(new Player("slytherinUser"));
-    //        players.add(new Player("hufflepuffUser"));
-    //
-    //        List<Player> list = new ArrayList<>(players);
-    //        int randIdx = new Random().nextInt(players.size());
-    //
-    //        Player randomPlayer = list.get(randIdx);
-    //        try {
-    //            this.loginUser(randomPlayer);
-    //        } catch (IOException e) {
-    //            throw new RuntimeException(e);
-    //        }
-    //    }
 
-    public Game(Set<Player> players) {
-        this.players = players;
+    public Game(ArrayList<Player> players) {
+        try {
+            this.rabbitClient.initializeConnection();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+        this.currentPlayers = players;
     }
 
     public void showGameRules() {
@@ -47,13 +44,6 @@ public class Game implements Runnable {
         System.out.println("\n\n");
     }
 
-    public void initializeUsers() {
-        gameUsers.add("gryffindorUser");
-        gameUsers.add("hufflepuffUser");
-        gameUsers.add("ravenclawUser");
-        gameUsers.add("slytherinUser");
-    }
-
     public void initializeCommonResources() {
         commonResources.put(Resource.BRICK, 2);
         commonResources.put(Resource.WOOD, 3);
@@ -61,18 +51,12 @@ public class Game implements Runnable {
         commonResources.put(Resource.GRAIN, 1);
         commonResources.put(Resource.STONE, 2);
     }
-
     public void loginUser(Player player) throws IOException {
-        System.out.println("LOGIN: Enter username");
+        System.out.println("LOGIN:");
         System.out.println(player.getUsername());
-        if (!gameUsers.contains(player.getUsername()) || player.getUsername() == null || player.getUsername().isEmpty()) {
-            System.out.println("This user does not exist! Please login with a different user.");
-        } else {
-            currentPlayers.add(player);
-            player.assignInitialResources(2, 2, 2, 2, 2);
-            System.out.println("Login successfully");
-            System.out.println();
-        }
+        player.assignInitialResources(2, 2, 2, 2, 2);
+        System.out.println("Login successfully");
+        System.out.println();
     }
 
     public static void confirmAndMadeExchange(Player currentPlayer) {
@@ -102,26 +86,23 @@ public class Game implements Runnable {
     }
 
     @Override public void run() {
-        // while true,
-        // citesc mesaje de pe rabbit,
-        // folosesc factory sa construiesc iaction
-        // aplez execute action pt fiecare mesaj
-        // trimit raspuns la client
+        Game gameInstance = this;
+        rabbitClient.startConsume("serverQueue", new RabbitCallback<RabbitMessage>() {
+            @Override
+            public void onMessage(RabbitMessage message) {
+                System.out.println("message having: " + message.getUuid() + " " + " " + message.getActionName());
+                IAction action = ActionFactory.construct(message, gameInstance);
+                if (action != null) {
+                    try {
+                        ActionResult actionResult = action.executeAction();
 
-//        Server server = new Server();
-//        server.serverStartProcessingMessages(message -> {
-//            IAction action = actonFactory.construct(message);
-//            action.executeAction();
-//        });
-        // while tru is running
-        for (Player player : players) {
-            try {
-                this.loginUser(player);
-            } catch (IOException e) {
-                throw new RuntimeException(e
-                );
+                        System.out.println(actionResult);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
             }
-            player.printPlayerResources();
-        }
+        }, RabbitMessageDeserializer.Create());
     }
 }

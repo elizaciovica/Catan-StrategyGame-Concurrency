@@ -27,7 +27,6 @@ public class RabbitClient {
         connection = connectionFactory.newConnection();
         this.serverChannel = connection.createChannel();
 
-        // TODO: create exchanges
         try {
             serverChannel.exchangeDeclare("client_exchange", "direct", true);
         } catch (IOException e) {
@@ -87,7 +86,7 @@ public class RabbitClient {
                     //noinspection unchecked
                     callback.onMessage(deserializer.deserialize(node));
                 }
-            }, (consumer -> {
+            }, (consumer -> {   //delivery cancel callback
                 System.out.printf("Canceled consumer %s%n", consumer);
             }));
             consumerTags.add(consumerTag);
