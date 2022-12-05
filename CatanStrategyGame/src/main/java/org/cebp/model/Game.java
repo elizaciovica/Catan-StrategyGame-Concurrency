@@ -51,11 +51,13 @@ public class Game implements Runnable {
         commonResources.put(Resource.GRAIN, 1);
         commonResources.put(Resource.STONE, 2);
     }
+
     public void loginUser(Player player) throws IOException {
         System.out.println("LOGIN:");
         System.out.println(player.getUsername());
         player.assignInitialResources(2, 2, 2, 2, 2);
-        System.out.println("Login successfully");
+        System.out.println("Login successfully" + "\n");
+        player.printPlayerResources();
         System.out.println();
     }
 
@@ -90,7 +92,8 @@ public class Game implements Runnable {
         rabbitClient.startConsume("serverQueue", new RabbitCallback<RabbitMessage>() {
             @Override
             public void onMessage(RabbitMessage message) {
-                System.out.println("message having: " + message.getUuid() + " " + " " + message.getActionName());
+                System.out.println("message having: " + message.getUuid() + " " + message.getPlayerName()
+                                   + " " + message.getActionName() + "\n");
                 IAction action = ActionFactory.construct(message, gameInstance);
                 if (action != null) {
                     try {
@@ -104,5 +107,10 @@ public class Game implements Runnable {
 
             }
         }, RabbitMessageDeserializer.Create());
+
+    }
+
+    public RabbitClient getRabbitClient() {
+        return rabbitClient;
     }
 }
