@@ -1,6 +1,5 @@
 package org.cebp.model;
 
-
 import org.cebp.messages.ActionFactory;
 import org.cebp.messages.ActionResult;
 import org.cebp.messages.IAction;
@@ -12,7 +11,6 @@ import org.cebp.rabbit.RabbitMessageDeserializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 public class Game implements Runnable {
@@ -23,7 +21,7 @@ public class Game implements Runnable {
 
     private static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
 
-    public Game() {
+    public Game(ArrayList<Player> players) {
         try {
             this.rabbitClient.initializeConnection();
         } catch (IOException e) {
@@ -31,6 +29,7 @@ public class Game implements Runnable {
         } catch (TimeoutException e) {
             throw new RuntimeException(e);
         }
+        this.currentPlayers = players;
     }
 
     public void showGameRules() {
@@ -52,11 +51,9 @@ public class Game implements Runnable {
         commonResources.put(Resource.GRAIN, 1);
         commonResources.put(Resource.STONE, 2);
     }
-
     public void loginUser(Player player) throws IOException {
         System.out.println("LOGIN:");
         System.out.println(player.getUsername());
-        currentPlayers.add(player);
         player.assignInitialResources(2, 2, 2, 2, 2);
         System.out.println("Login successfully");
         System.out.println();
@@ -93,11 +90,12 @@ public class Game implements Runnable {
         rabbitClient.startConsume("serverQueue", new RabbitCallback<RabbitMessage>() {
             @Override
             public void onMessage(RabbitMessage message) {
-                System.out.println("message having: " + message.getUuid() + " " + message.getPlayerName() + " " + message.getActionName());
+                System.out.println("message having: " + message.getUuid() + " " + " " + message.getActionName());
                 IAction action = ActionFactory.construct(message, gameInstance);
                 if (action != null) {
                     try {
                         ActionResult actionResult = action.executeAction();
+
                         System.out.println(actionResult);
                     } catch (IOException e) {
                         throw new RuntimeException(e);

@@ -6,13 +6,14 @@ import org.cebp.rabbit.RabbitClient;
 import org.cebp.rabbit.RabbitMessage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-public class Client implements Runnable {
+public class Client {
     public final RabbitClient rabbitClient = new RabbitClient();
+
     private String playerName;
+
     public Client(String playerName) {
         this.playerName = playerName;
         try {
@@ -24,8 +25,7 @@ public class Client implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
+    public void createClient() {
         try {
             rabbitClient.createPlayerQueue(this.playerName);
         } catch (IOException e) {
@@ -37,12 +37,16 @@ public class Client implements Runnable {
 
         RabbitMessage message = new RabbitMessage("LoginUserAction", this.playerName, objectNode);
         List<RabbitMessage> rabbitMessages = List.of(message);
-        for (RabbitMessage m: rabbitMessages) {
+        for (RabbitMessage m : rabbitMessages) {
             try {
                 rabbitClient.publishToServer(m);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 }
