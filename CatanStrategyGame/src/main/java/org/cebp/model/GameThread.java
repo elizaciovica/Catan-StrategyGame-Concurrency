@@ -47,8 +47,8 @@ public class GameThread extends Thread {
 
                 System.out.println(threadName + " gets a permit.");
 
-                City city = new City();
-                city.createCity(player2);
+                //City city = new City();
+               // city.createCity(player2);
                 Thread.sleep(500);
 
             } catch (InterruptedException exc) {

@@ -2,7 +2,10 @@ package org.cebp.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 public class Game implements Runnable {
@@ -12,6 +15,8 @@ public class Game implements Runnable {
     private static ArrayList<Player> currentPlayers = new ArrayList<>();
 
     private static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
+
+    private Integer[] actionList = {1, 2, 3, 4, 5};
     private Set<Player> players;
     //
     //    public void simulate() {
@@ -99,11 +104,15 @@ public class Game implements Runnable {
     public static ArrayList<Player> getCurrentPlayers() {
         return currentPlayers;
     }
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
 
     @Override public void run() {
         for (Player player : players) {
             try {
                 this.loginUser(player);
+                player.tryAction(getRandomNumber(1, 5));
             } catch (IOException e) {
                 throw new RuntimeException(e
                 );
