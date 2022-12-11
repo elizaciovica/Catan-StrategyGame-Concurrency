@@ -78,11 +78,11 @@ public class Player{
     }
 
     public void returnNumberOfPlayerHouses() {
-        System.out.println("You currently have " + this.houses + " houses");
+        System.out.println(this.username + ": you currently have " + this.houses + " houses");
     }
 
     public void returnNumberOfPlayerCities() {
-        System.out.println("You currently have " + this.cities + " cities");
+        System.out.println(this.username + ": you currently have " + this.cities + " cities");
     }
 
 
@@ -97,7 +97,7 @@ public class Player{
                         playerResourceToExchange = Resource.BRICK;
                         System.out.println("Exchanged Resource set!");
                     } else {
-                        System.out.println("You don't have any more bricks available.");
+                        System.out.println(this.username + ": you don't have any more bricks available.");
                         exit(0);
                     }
                     break;
@@ -107,7 +107,7 @@ public class Player{
                         playerResourceToExchange = Resource.WOOD;
                         System.out.println("Exchanged Resource set!");
                     } else {
-                        System.out.println("You don't have any more wood available.");
+                        System.out.println(this.username + ": you don't have any more wood available.");
                         exit(0);
                     }
                     break;
@@ -117,7 +117,7 @@ public class Player{
                         playerResourceToExchange = Resource.SHEEP;
                         System.out.println("Exchanged Resource set!");
                     } else {
-                        System.out.println("You don't have any more sheep available.");
+                        System.out.println(this.username + ": you don't have any more sheep available.");
                         exit(0);
                     }
                     break;
@@ -127,7 +127,7 @@ public class Player{
                         playerResourceToExchange = Resource.GRAIN;
                         System.out.println("Exchanged Resource set!");
                     } else {
-                        System.out.println("You don't have any more grain available.");
+                        System.out.println(this.username + ": you don't have any more grain available.");
                         exit(0);
                     }
                     break;
@@ -137,7 +137,7 @@ public class Player{
                         playerResourceToExchange = Resource.STONE;
                         System.out.println("Exchanged Resource set!");
                     } else {
-                        System.out.println("You don't have any more stones available.");
+                        System.out.println(this.username + ": you don't have any more stones available.");
                         exit(0);
                     }
                     break;
@@ -163,7 +163,192 @@ public class Player{
         }
     }
 
-    public Resource getPlayerResourceToExchange() {
+    public void tryAction(int step) {
+        switch (step) {
+            case 1:
+                this.createHouse();
+                break;
+            case 2:
+                this.createCity();
+                break;
+            case 3:
+                this.setPlayerOpenToExchange(Resource.BRICK, Resource.WOOD);
+                break;
+            case 4:
+                this.setPlayerOpenToExchange(Resource.WOOD, Resource.BRICK);
+                break;
+            case 5:
+                this.createResource(Resource.WOOD);
+                break;
+            case 6:
+                this.createResource(Resource.GRAIN);
+                break;
+            case 7:
+                this.createResource(Resource.SHEEP);
+                break;
+            case 8:
+                this.createResource(Resource.STONE);
+                break;
+            case 9:
+                this.createResource(Resource.BRICK);
+                break;
+            //TODO case for exchange confirm
+        }
+    }
+
+    public void createResource(Resource wantedResource) {
+        HashMap<Resource, Integer> playerResources = this.getPlayerResources();
+        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
+        if(playerResources != null) {
+            if (playerResources.get(Resource.SHEEP) < 1
+                || playerResources.get(Resource.GRAIN) < 1
+                || playerResources.get(Resource.STONE) < 1) {
+                System.out.println(this.username + " You don't have enough resources. Please check your resources.");
+                //to be implemented => if the player doesn't have enough resources,
+                // he will be redirected to the menu actions
+            } else {
+                removeResourcesInExchangeForAnotherResource(playerResources, commonResources);
+
+                switch (wantedResource) {
+                    case BRICK:
+                        if(commonResources.get(Resource.BRICK) > 0) {
+                            playerResources.put(Resource.BRICK, playerResources.get(Resource.BRICK) + 1);
+                            commonResources.put(Resource.BRICK, commonResources.get(Resource.BRICK) - 1);
+                            System.out.println("Brick resource created successfully for player: " + this.username);
+                        } else {
+                            System.out.println("There are no more bricks available for player: " + this.username);
+                            exit(0);
+                        }
+                    case WOOD:
+                        if(commonResources.get(Resource.WOOD) > 0) {
+                            playerResources.put(Resource.WOOD, playerResources.get(Resource.WOOD) + 1);
+                            commonResources.put(Resource.WOOD, commonResources.get(Resource.WOOD) - 1);
+                            System.out.println("Wood resource created successfully for player: " + this.username);
+                        } else {
+                            System.out.println("There is no more wood available for player: " + this.username);
+                            exit(0);
+                        }
+                    case SHEEP:
+                        if(commonResources.get(Resource.SHEEP) > 0) {
+                            playerResources.put(Resource.SHEEP, playerResources.get(Resource.SHEEP) + 1);
+                            commonResources.put(Resource.SHEEP, commonResources.get(Resource.SHEEP) - 1);
+                            System.out.println("Sheep resource created successfully for player: " + this.username);
+                        } else {
+                            System.out.println("There are no more sheep available for player: " + this.username);
+                            exit(0);
+                        }
+                    case GRAIN:
+                        if(commonResources.get(Resource.GRAIN) > 0) {
+                            playerResources.put(Resource.GRAIN, playerResources.get(Resource.GRAIN) + 1);
+                            commonResources.put(Resource.GRAIN, commonResources.get(Resource.GRAIN) - 1);
+                            System.out.println("Grain resource created successfully for player: " + this.username);
+                        } else {
+                            System.out.println("There is no more grain available.");
+                            exit(0);
+                        }
+                    case STONE:
+                        if(commonResources.get(Resource.STONE) > 0) {
+                            playerResources.put(Resource.STONE, playerResources.get(Resource.STONE) + 1);
+                            commonResources.put(Resource.STONE, commonResources.get(Resource.STONE) - 1);
+                            System.out.println("Stone resource created successfully for player: " + this.username);
+                        } else {
+                            System.out.println("There are no more stones available for player: " + this.username);
+                            exit(0);
+                        }
+                }
+            }
+        } else {
+            exit(0);
+        }
+    }
+
+    private void removeResourcesInExchangeForAnotherResource(HashMap<Resource, Integer> playerResources,
+                                                             HashMap<Resource, Integer> commonResources) {
+        playerResources.put(Resource.SHEEP, playerResources.get(Resource.SHEEP) - 1);
+        playerResources.put(Resource.GRAIN, playerResources.get(Resource.GRAIN) - 1);
+        playerResources.put(Resource.STONE, playerResources.get(Resource.STONE) - 1);
+
+        commonResources.put(Resource.SHEEP, commonResources.get(Resource.SHEEP) + 1);
+        commonResources.put(Resource.GRAIN, commonResources.get(Resource.GRAIN) + 1);
+        commonResources.put(Resource.STONE, commonResources.get(Resource.STONE) + 1);
+    }
+
+    public void createHouse() {
+        HashMap<Resource, Integer> playerResources = this.getPlayerResources();
+        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
+        if (playerResources != null) {
+            if (playerResources.get(Resource.BRICK) < 1
+                || playerResources.get(Resource.WOOD) < 1
+                || playerResources.get(Resource.GRAIN) < 1
+                || playerResources.get(Resource.SHEEP) < 1) {
+                System.out.println(this.username + " You don't have enough resources to create a house. Please check your resources.");
+                System.out.println();
+                exit(0);
+                //to be implemented => if the player doesn't have enough resources,
+                // he will be redirected to the menu actions
+            } else {
+                removeResourcesInExchangeForHouse(playerResources, commonResources);
+                this.increaseNoOfHouses();
+                this.increasePointsForHouse();
+                System.out.println("House created successfully for player " + this.username);
+                System.out.println();
+            }
+        } else {
+            exit(0);
+        }
+    }
+
+    private void removeResourcesInExchangeForHouse(HashMap<Resource, Integer> playerResources,
+                                                   HashMap<Resource, Integer> commonResources) {
+        playerResources.put(Resource.BRICK, playerResources.get(Resource.BRICK) - 1);
+        playerResources.put(Resource.WOOD, playerResources.get(Resource.WOOD) - 1);
+        playerResources.put(Resource.GRAIN, playerResources.get(Resource.GRAIN) - 1);
+        playerResources.put(Resource.SHEEP, playerResources.get(Resource.SHEEP) - 1);
+
+        synchronized (this) {
+            commonResources.put(Resource.BRICK, commonResources.get(Resource.BRICK) + 1);
+            commonResources.put(Resource.WOOD, commonResources.get(Resource.WOOD) + 1);
+            commonResources.put(Resource.GRAIN, commonResources.get(Resource.GRAIN) + 1);
+            commonResources.put(Resource.SHEEP, commonResources.get(Resource.SHEEP) + 1);
+            try {
+                wait(500);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                System.err.println("Thread Interrupted");
+            }
+            notifyAll();
+        }
+    }
+
+    public void createCity() {
+        HashMap<Resource, Integer> playerResources = this.getPlayerResources();
+        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
+        if(playerResources != null) {
+            if (playerResources.get(Resource.GRAIN) < 2 || playerResources.get(Resource.STONE) < 3) {
+                System.out.println(this.username + " You don't have enough resources to create a city. Please check your resources.");
+                System.out.println();
+                //to be implemented => if the player doesn't have enough resources,
+                // he will be redirected to the menu actions
+            } else {
+                removeResourcesInExchangeForCity(playerResources, commonResources);
+                this.increaseNoOfCities();
+                this.increasePointsForCity();
+                System.out.println("City created successfully for player: " + this.username);
+                System.out.println();
+            }
+        } else {
+            exit(0);
+        }
+    }
+
+    private void removeResourcesInExchangeForCity(HashMap<Resource, Integer> playerResources,
+                                                  HashMap<Resource, Integer> commonResources) {
+        playerResources.put(Resource.GRAIN, playerResources.get(Resource.GRAIN) - 2);
+        playerResources.put(Resource.STONE, playerResources.get(Resource.STONE) - 3);
+
+        commonResources.put(Resource.GRAIN, commonResources.get(Resource.GRAIN) + 2);
+        commonResources.put(Resource.STONE, commonResources.get(Resource.STONE) + 3);
+    }    public Resource getPlayerResourceToExchange() {
         return playerResourceToExchange;
     }
 
