@@ -87,6 +87,10 @@ public class Game implements Runnable {
         return currentPlayers;
     }
 
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
     @Override public void run() {
         Game gameInstance = this;
         rabbitClient.startConsume("serverQueue", new RabbitCallback<RabbitMessage>() {
@@ -107,6 +111,16 @@ public class Game implements Runnable {
 
             }
         }, RabbitMessageDeserializer.Create());
+
+        /* getting the players to do random actions
+        for (Player player : players) {
+            try {
+                this.loginUser(player);
+                player.tryAction(getRandomNumber(1, 5));
+            } catch (IOException e) {
+                throw new RuntimeException(e
+                );
+         */
 
     }
 
