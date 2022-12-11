@@ -95,6 +95,16 @@ public class RabbitClient {
         }
     };
 
+    public void consumeSync(){
+        boolean autoAck = false;
+        GetResponse response = channel.basicGet(queueName, autoAck);
+        if (response == null) {
+            // No message retrieved.
+        } else {
+            AMQP.BasicProperties props = response.getProps();
+            byte[] body = response.getBody();
+            long deliveryTag = response.getEnvelope().getDeliveryTag();}
+    }
     public void shutdown() {
         try {
             for (String consumerTag: consumerTags) {
