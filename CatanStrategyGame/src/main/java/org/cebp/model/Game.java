@@ -7,33 +7,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class Game implements Runnable {
+public class Game {
 
     public static final ArrayList<String> gameUsers = new ArrayList<>();
 
     private static ArrayList<Player> currentPlayers = new ArrayList<>();
 
     private static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
-
-    private Integer[] actionList = {1, 2, 3, 4, 5};
     private Set<Player> players;
-    //
-    //    public void simulate() {
-    //        players.add(new Player("ravenclawUser"));
-    //        players.add(new Player("slytherinUser"));
-    //        players.add(new Player("hufflepuffUser"));
-    //
-    //        List<Player> list = new ArrayList<>(players);
-    //        int randIdx = new Random().nextInt(players.size());
-    //
-    //        Player randomPlayer = list.get(randIdx);
-    //        try {
-    //            this.loginUser(randomPlayer);
-    //        } catch (IOException e) {
-    //            throw new RuntimeException(e);
-    //        }
-    //    }
+
+    private static final Lock gameLock = new ReentrantLock();
+
+    public static final Lock playerLock = new ReentrantLock();
 
     public Game(Set<Player> players) {
         this.players = players;
@@ -73,32 +63,20 @@ public class Game implements Runnable {
             System.out.println("This user does not exist! Please login with a different user.");
         } else {
             currentPlayers.add(player);
-            player.assignInitialResources(2, 2, 2, 2, 2);
+            player.assignInitialResources(4, 4, 4, 4, 4);
             System.out.println("Login successfully");
             System.out.println();
         }
     }
 
-    public static void confirmAndMadeExchange(Player currentPlayer) {
-        Resource resourceToExchange = currentPlayer.getPlayerResourceToExchange();
-        Resource wantedResource = currentPlayer.getPlayerWantedResource();
-        currentPlayers.forEach(player -> {
-            if (!currentPlayer.equals(player)) {
-                //if the resource the player wants to give is equal to the resource the other player wants to get and
-                //if the resource the player wants to get is equal to the resource the other player wants to give
-                //then the exchange is made
-                if (wantedResource == player.getPlayerResourceToExchange()
-                    && resourceToExchange == player.getPlayerWantedResource()) {
-                    currentPlayer.getPlayerResources().put(wantedResource,
-                                                           currentPlayer.getPlayerResources().get(wantedResource) + 1);
-                    player.getPlayerResources().put(resourceToExchange, player.getPlayerResources().get(resourceToExchange) + 1);
-                }
-            }
-        });
-    }
 
     public static HashMap<Resource, Integer> getCommonResources() {
-        return commonResources;
+        gameLock.lock();
+        try {
+            return commonResources;
+        } finally {
+            gameLock.unlock();
+        }
     }
 
     public static ArrayList<Player> getCurrentPlayers() {
@@ -107,17 +85,19 @@ public class Game implements Runnable {
     public int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
+    static ExecutorService service = Executors.newFixedThreadPool(3);
 
-    @Override public void run() {
-        for (Player player : players) {
-            try {
-                this.loginUser(player);
-                player.tryAction(getRandomNumber(1, 5));
-            } catch (IOException e) {
-                throw new RuntimeException(e
-                );
-            }
-            player.printPlayerResources();
+    public void simulate() {
+        for(Player player: currentPlayers) {
+            service.execute(player);
         }
+    }
+
+    public static void stopExecutor() {
+        service.shutdownNow();
+    }
+
+    public static Lock getPlayerLock() {
+        return playerLock;
     }
 }

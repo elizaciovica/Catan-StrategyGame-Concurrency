@@ -3,6 +3,7 @@ package org.cebp;
 import org.cebp.model.Game;
 import org.cebp.model.Player;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -10,7 +11,7 @@ import java.util.concurrent.Executors;
 
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
 
         Player player1 = new Player("ravenclawUser");
         Player player2 = new Player("slytherinUser");
@@ -24,10 +25,13 @@ public class Main {
         game.showGameRules();
         game.initializeUsers();
         game.initializeCommonResources();
+        game.loginUser(player1);
+        game.loginUser(player2);
+        game.loginUser(player3);
+        game.simulate();
 
-        ExecutorService service = Executors.newFixedThreadPool(3);
-        service.execute(game);
-        service.shutdown();
+
+
 
 
         //        //this can cause thread interference and memory inconsistency

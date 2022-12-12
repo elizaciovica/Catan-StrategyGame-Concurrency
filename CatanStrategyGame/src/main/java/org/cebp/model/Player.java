@@ -3,8 +3,11 @@ package org.cebp.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.System.exit;
+import static org.cebp.model.Game.playerLock;
 
 public class Player implements Runnable {
     private String username;
@@ -20,6 +23,8 @@ public class Player implements Runnable {
     private Resource playerResourceToExchange;
 
     private Resource playerWantedResource;
+
+
 
     public Player(String username) {
         this.username = username;
@@ -61,13 +66,8 @@ public class Player implements Runnable {
     }
 
     public void printCommonResources() {
-        synchronized (this) {
-            try {
-                wait(500);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                System.err.println("Thread Interrupted");
-            }
+        Game.getPlayerLock().lock();
+        try {
             System.out.println("Currently, there are available the following resources: ");
             System.out.println(Resource.BRICK + " " + Game.getCommonResources().get(Resource.BRICK).toString());
             System.out.println(Resource.WOOD + " " + Game.getCommonResources().get(Resource.WOOD).toString());
@@ -75,7 +75,8 @@ public class Player implements Runnable {
             System.out.println(Resource.GRAIN + " " + Game.getCommonResources().get(Resource.GRAIN).toString());
             System.out.println(Resource.STONE + " " + Game.getCommonResources().get(Resource.STONE).toString());
             System.out.println();
-            notifyAll();
+        } finally {
+            playerLock.unlock();
         }
     }
 
@@ -163,27 +164,21 @@ public class Player implements Runnable {
                     break;
             }
         }
-    }
 
-    public void tryAction(int step) {
-        switch (step) {
-            case 1:
-                this.createHouse();
-                break;
-            case 2:
-                this.createCity();
-                break;
-            case 3:
-                this.setPlayerOpenToExchange(Resource.BRICK, Resource.WOOD);
-                break;
-            case 4:
-                this.setPlayerOpenToExchange(Resource.WOOD, Resource.BRICK);
-                break;
-            case 5:
-                this.createResource(Resource.WOOD);
-                break;
-            //case 6: this.createResource();
-        }
+        Game.getCurrentPlayers().forEach(player -> {
+            if (!this.equals(player)) {
+                //if the resource the player wants to give is equal to the resource the other player wants to get and
+                //if the resource the player wants to get is equal to the resource the other player wants to give
+                //then the exchange is made
+                if (wantedResource == player.getPlayerResourceToExchange()
+                    && toExchangeResource == player.getPlayerWantedResource()) {
+                    this.getPlayerResources().put(wantedResource,
+                                                           this.getPlayerResources().get(wantedResource) + 1);
+                    player.getPlayerResources().put(toExchangeResource, player.getPlayerResources().get(toExchangeResource) + 1);
+                }
+            }
+        });
+
     }
 
     public void createResource(Resource wantedResource) {
@@ -264,27 +259,37 @@ public class Player implements Runnable {
     }
 
     public void createHouse() {
-        HashMap<Resource, Integer> playerResources = this.getPlayerResources();
-        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
-        if (playerResources != null) {
-            if (playerResources.get(Resource.BRICK) < 1
-                || playerResources.get(Resource.WOOD) < 1
-                || playerResources.get(Resource.GRAIN) < 1
-                || playerResources.get(Resource.SHEEP) < 1) {
-                System.out.println(this.username + " You don't have enough resources to create a house. Please check your resources.");
-                System.out.println();
-                exit(0);
-                //to be implemented => if the player doesn't have enough resources,
-                // he will be redirected to the menu actions
+        playerLock.lock();
+        try {
+            HashMap<Resource, Integer> playerResources = this.getPlayerResources();
+            HashMap<Resource, Integer> commonResources = Game.getCommonResources();
+            if (playerResources != null) {
+                if (playerResources.get(Resource.BRICK) < 1
+                    || playerResources.get(Resource.WOOD) < 1
+                    || playerResources.get(Resource.GRAIN) < 1
+                    || playerResources.get(Resource.SHEEP) < 1) {
+                    System.out.println(this.username + " You don't have enough resources to create a house. Please check your resources.");
+                    System.out.println();
+                    System.exit(0);
+                } else {
+                    removeResourcesInExchangeForHouse(playerResources, commonResources);
+                    this.points += 1;
+                    System.out.println("House created successfully for player " + this.username);
+                    System.out.println();
+
+                    //just to test it
+                    //todo check for the points
+                    if (this.points == 1) {
+                        System.out.println("Player: " + this.username + " won the Game");
+                        Game.stopExecutor();
+                        System.exit(0);
+                    }
+                }
             } else {
-                removeResourcesInExchangeForHouse(playerResources, commonResources);
-                this.increaseNoOfHouses();
-                this.increasePointsForHouse();
-                System.out.println("House created successfully for player " + this.username);
-                System.out.println();
+                exit(0);
             }
-        } else {
-            exit(0);
+        } finally {
+            playerLock.unlock();
         }
     }
 
@@ -311,23 +316,33 @@ public class Player implements Runnable {
     }
 
     public void createCity() {
-        HashMap<Resource, Integer> playerResources = this.getPlayerResources();
-        HashMap<Resource, Integer> commonResources = Game.getCommonResources();
-        if(playerResources != null) {
-            if (playerResources.get(Resource.GRAIN) < 2 || playerResources.get(Resource.STONE) < 3) {
-                System.out.println(this.username + " You don't have enough resources to create a city. Please check your resources.");
-                System.out.println();
-                //to be implemented => if the player doesn't have enough resources,
-                // he will be redirected to the menu actions
+        playerLock.lock();
+        try {
+            HashMap<Resource, Integer> playerResources = this.getPlayerResources();
+            HashMap<Resource, Integer> commonResources = Game.getCommonResources();
+
+            if (playerResources != null) {
+                if (playerResources.get(Resource.GRAIN) < 2 || playerResources.get(Resource.STONE) < 3) {
+                    System.out.println(this.username + " You don't have enough resources to create a city. Please check your resources.");
+                    System.out.println();
+                } else {
+                    removeResourcesInExchangeForCity(playerResources, commonResources);
+                    this.increaseNoOfCities();
+                    this.points += 2;
+                    System.out.println("City created successfully for player: " + this.username);
+                    System.out.println();
+
+                    if (this.points == 2) {
+                        System.out.println("Player: " + this.username + " won the Game");
+                        Game.stopExecutor();
+                        exit(0);
+                    }
+                }
             } else {
-                removeResourcesInExchangeForCity(playerResources, commonResources);
-                this.increaseNoOfCities();
-                this.increasePointsForCity();
-                System.out.println("City created successfully for player: " + this.username);
-                System.out.println();
+                exit(0);
             }
-        } else {
-            exit(0);
+        } finally {
+            playerLock.unlock();
         }
     }
 
@@ -372,7 +387,42 @@ public class Player implements Runnable {
         this.cities = cities;
     }
 
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
+    public void validatePlayer() {
+        if(this.playerResources.get(Resource.BRICK) < 1 ||
+           this.playerResources.get(Resource.WOOD) < 1 ||
+           this.playerResources.get(Resource.SHEEP) < 1 ||
+           this.playerResources.get(Resource.STONE) < 1 ||
+           this.playerResources.get(Resource.GRAIN) < 1) {
+            Game.stopExecutor();
+        }
+    }
+
     @Override public void run() {
+        int step = getRandomNumber(1, 2);
+        while(true) {
+            switch (step) {
+                case 1:
+                    this.printCommonResources();
+                    this.createHouse();
+                case 2:
+                    this.createCity();
+                    //todo call methods to play te game
+//                case 3:
+//                    this.setPlayerOpenToExchange(Resource.BRICK, Resource.WOOD);
+//                    break;
+//                case 4:
+//                    this.setPlayerOpenToExchange(Resource.WOOD, Resource.BRICK);
+//                    break;
+//                case 3:
+//                    this.createResource(Resource.WOOD);
+//                    break;
+                //case 6: this.createResource();
+            }
+        }
 
     }
 }
