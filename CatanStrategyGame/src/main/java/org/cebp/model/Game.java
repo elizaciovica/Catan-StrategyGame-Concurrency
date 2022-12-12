@@ -4,9 +4,7 @@ import org.cebp.messages.ActionFactory;
 import org.cebp.messages.ActionResult;
 import org.cebp.messages.IAction;
 import org.cebp.rabbit.RabbitCallback;
-import org.cebp.rabbit.RabbitClient;
 import org.cebp.rabbit.RabbitMessage;
-import org.cebp.rabbit.RabbitMessageDeserializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,20 +13,14 @@ import java.util.concurrent.TimeoutException;
 
 public class Game implements Runnable {
 
-    public final RabbitClient rabbitClient = new RabbitClient();
+    //public final RabbitClient rabbitClient = new RabbitClient();
 
     private static ArrayList<Player> currentPlayers = new ArrayList<>();
 
     private static final HashMap<Resource, Integer> commonResources = new HashMap<Resource, Integer>();
 
     public Game(ArrayList<Player> players) {
-        try {
-            this.rabbitClient.initializeConnection();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
-        }
+        //this.rabbitClient.initializeConnection();
         this.currentPlayers = players;
     }
 
@@ -91,40 +83,45 @@ public class Game implements Runnable {
         return (int) ((Math.random() * (max - min)) + min);
     }
 
-    @Override public void run() {
-        Game gameInstance = this;
-        rabbitClient.startConsume("serverQueue", new RabbitCallback<RabbitMessage>() {
-            @Override
-            public void onMessage(RabbitMessage message) {
-                System.out.println("message having: " + message.getUuid() + " " + message.getPlayerName()
-                                   + " " + message.getActionName() + "\n");
-                IAction action = ActionFactory.construct(message, gameInstance);
-                if (action != null) {
-                    try {
-                        ActionResult actionResult = action.executeAction();
-
-                        System.out.println(actionResult);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-            }
-        }, RabbitMessageDeserializer.Create());
-
-        /* getting the players to do random actions
-        for (Player player : players) {
-            try {
-                this.loginUser(player);
-                player.tryAction(getRandomNumber(1, 5));
-            } catch (IOException e) {
-                throw new RuntimeException(e
-                );
-         */
+    @Override
+    public void run() {
 
     }
 
-    public RabbitClient getRabbitClient() {
-        return rabbitClient;
-    }
+//    @Override public void run() {
+//        Game gameInstance = this;
+//        rabbitClient.startConsume("serverQueue", new RabbitCallback<RabbitMessage>() {
+//            @Override
+//            public void onMessage(RabbitMessage message) {
+//                System.out.println("message having: " + message.getUuid() + " " + message.getPlayerName()
+//                                   + " " + message.getActionName() + "\n");
+//                IAction action = ActionFactory.construct(message, gameInstance);
+//                if (action != null) {
+//                    try {
+//                        ActionResult actionResult = action.executeAction();
+//
+//                        System.out.println(actionResult);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//
+//            }
+//        }, RabbitMessageDeserializer.Create());
+//
+//        /* getting the players to do random actions
+//        for (Player player : players) {
+//            try {
+//                this.loginUser(player);
+//                player.tryAction(getRandomNumber(1, 5));
+//            } catch (IOException e) {
+//                throw new RuntimeException(e
+//                );
+//         */
+//
+//    }
+//
+//    public RabbitClient getRabbitClient() {
+//        return rabbitClient;
+//    }
 }

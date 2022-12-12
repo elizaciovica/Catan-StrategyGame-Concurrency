@@ -1,5 +1,9 @@
 package org.cebp.model;
 
+import org.cebp.rabbit.RabbitClient;
+import org.cebp.rabbit.RabbitMessage;
+
+import java.io.IOException;
 import java.util.HashMap;
 
 import static java.lang.System.exit;
@@ -19,8 +23,11 @@ public class Player{
 
     private Resource playerWantedResource;
 
-    public Player(String username) {
+    private final RabbitClient rabbitClient;
+
+    public Player(String username, RabbitClient rabbitClient) {
         this.username = username;
+        this.rabbitClient = rabbitClient;
     }
 
     public void assignInitialResources(int bricks, int wood, int sheep, int grain, int stones) {
@@ -32,6 +39,10 @@ public class Player{
         playerResources.put(Resource.STONE, stones);
     }
 
+    public void sendLoginMessage() throws IOException {
+        RabbitMessage message = new RabbitMessage("loginAction", this.username);
+        this.rabbitClient.publish(message);
+    }
     public void increaseNoOfHouses() {
         this.houses += 1;
     }

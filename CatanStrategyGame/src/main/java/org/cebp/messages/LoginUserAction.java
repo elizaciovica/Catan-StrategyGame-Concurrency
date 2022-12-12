@@ -30,13 +30,9 @@ public class LoginUserAction implements IAction {
     @Override
     public ActionResult executeAction() {
         // the action that is corresponding to the respective kind of message
-        try {
-            System.out.println("executing login user action");
-            game.loginUser(new Player(playerName));
-            return ActionResult.ACTION_RESULT_SUCCESS;
-        } catch (IOException e) {
-            return ActionResult.ACTION_RESULT_FAILED;
-        }
+        System.out.println("executing login user action");
+        //game.loginUser(new Player(playerName));
+        return ActionResult.ACTION_RESULT_SUCCESS;
     }
 
 }
