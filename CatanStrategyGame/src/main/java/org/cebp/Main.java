@@ -8,8 +8,6 @@ import org.cebp.rabbit.RabbitMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public class Main {
@@ -18,8 +16,6 @@ public class Main {
         RabbitClient rabbitClient = new RabbitClient();
         rabbitClient.initializeConnection();
 
-
-        ExecutorService service = Executors.newFixedThreadPool(3);
         ArrayList<Player> players = new ArrayList<>();
         Player player1 = new Player("JohnDoe", rabbitClient);   // generate random player method?
         Player player2 = new Player("Batman", rabbitClient);
@@ -49,8 +45,9 @@ public class Main {
 //        client1.createClient();
 //        client2.createClient();
 
-        service.execute(game);
+        game.loginUser(player1);
+        game.loginUser(player2);
+        game.simulate();
 
-        service.shutdown();
     }
 }
