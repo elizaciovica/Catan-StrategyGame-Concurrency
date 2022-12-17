@@ -31,7 +31,7 @@ public class Game {
 
     public Game(ArrayList<Player> players) {
         //this.rabbitClient.initializeConnection();
-        this.currentPlayers = players;
+        currentPlayers = players;
     }
 
     public void showGameRules() {
