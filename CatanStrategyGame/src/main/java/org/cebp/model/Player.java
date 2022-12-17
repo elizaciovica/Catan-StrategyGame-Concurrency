@@ -367,9 +367,16 @@ public class Player implements Runnable {
     }
 
     @Override public void run() {
+        System.out.println("Executing thread " + Thread.currentThread().getName() + " for player " + this.getUsername());
         try {
-            int step = getRandomNumber(1, 6);
             while (true) {
+                int step = getRandomNumber(1, 6);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
                 switch (step) {
                     case 1:
                         this.createHouse();
@@ -378,11 +385,11 @@ public class Player implements Runnable {
                         this.createCity();
 
                     case 3:
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+//                        try {
+//                            Thread.sleep(500);
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
                         //todo maybe sync??
                         if (this.playerResources.get(Resource.GRAIN) < 3 ||
                             this.playerResources.get(Resource.SHEEP) < 2 ||
