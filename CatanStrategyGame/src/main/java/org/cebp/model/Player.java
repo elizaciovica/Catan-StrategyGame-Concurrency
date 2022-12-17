@@ -1,10 +1,7 @@
 package org.cebp.model;
 
-import org.cebp.rabbit.RabbitClient;
-import org.cebp.rabbit.RabbitMessage;
-
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.System.exit;
 import static org.cebp.model.Game.playerLock;
@@ -24,11 +21,8 @@ public class Player implements Runnable {
 
     private Resource playerWantedResource;
 
-    private final RabbitClient rabbitClient;
-
-    public Player(String username, RabbitClient rabbitClient) {
+    public Player(String username) {
         this.username = username;
-        this.rabbitClient = rabbitClient;
     }
 
     public void assignInitialResources(int bricks, int wood, int sheep, int grain, int stones) {
@@ -40,10 +34,6 @@ public class Player implements Runnable {
         playerResources.put(Resource.STONE, stones);
     }
 
-    public void sendLoginMessage() throws IOException {
-        RabbitMessage message = new RabbitMessage("loginAction", this.username);
-        this.rabbitClient.publish(message);
-    }
     public void increaseNoOfHouses() {
         this.houses += 1;
     }
@@ -175,6 +165,8 @@ public class Player implements Runnable {
             }
         }
 
+        AtomicReference<Boolean> exchangeMade = new AtomicReference<>(false);
+        AtomicReference<String> exchangePartner = new AtomicReference<>(null);
         //accepting the exchange to a possible match
         Game.getCurrentPlayers().forEach(player -> {
             if (!this.equals(player)) {
@@ -186,9 +178,15 @@ public class Player implements Runnable {
                     this.getPlayerResources().put(wantedResource,
                                                   this.getPlayerResources().get(wantedResource) + 1);
                     player.getPlayerResources().put(toExchangeResource, player.getPlayerResources().get(toExchangeResource) + 1);
+                    exchangeMade.set(true);
+                    exchangePartner.set(player.getUsername());
                 }
             }
         });
+
+        if (exchangeMade.get()){
+            System.out.println(this.getUsername() + " exchanged " + wantedResource + " for " + toExchangeResource + " with " + exchangePartner.get());
+        }
     }
 
     public void createResource(Resource wantedResource) {
@@ -385,11 +383,6 @@ public class Player implements Runnable {
                         this.createCity();
 
                     case 3:
-//                        try {
-//                            Thread.sleep(500);
-//                        } catch (InterruptedException e) {
-//                            throw new RuntimeException(e);
-//                        }
                         //todo maybe sync??
                         if (this.playerResources.get(Resource.GRAIN) < 3 ||
                             this.playerResources.get(Resource.SHEEP) < 2 ||
@@ -420,14 +413,14 @@ public class Player implements Runnable {
                         }
                         break;
 
-                    //todo call methods to play te game
-                    //                case 3:
-                    //                    this.setPlayerOpenToExchange(Resource.BRICK, Resource.WOOD);
-                    //                    break;
-                    //                case 4:
-                    //                    this.setPlayerOpenToExchange(Resource.WOOD, Resource.BRICK);
-                    //                    break;
-                    //todo problemo when randomize getting stuck
+                    case 6:
+                        System.out.println("setting player " + this.getUsername() + " open to exchange, B, W");
+                        this.setPlayerOpenToExchange(Resource.BRICK, Resource.WOOD);
+                        break;
+                    case 7:
+                        System.out.println("setting player " + this.getUsername() + " open to exchange, W, B");
+                        this.setPlayerOpenToExchange(Resource.WOOD, Resource.BRICK);
+                        break;
                 }
             }
         } catch (Exception exp) {

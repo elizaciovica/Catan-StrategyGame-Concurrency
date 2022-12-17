@@ -4,6 +4,7 @@ import org.cebp.messages.ActionFactory;
 import org.cebp.messages.ActionResult;
 import org.cebp.messages.IAction;
 import org.cebp.rabbit.RabbitCallback;
+import org.cebp.rabbit.RabbitClient;
 import org.cebp.rabbit.RabbitMessage;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Game {
 
-    //public final RabbitClient rabbitClient = new RabbitClient();
+    private static final String[] playerNames = new String[] {"Ani", "Sam", "Joe", "Jack", "Batman", "Chris", "Louis", "Ricky", "Martin", "Tulu"};
 
     private static ArrayList<Player> currentPlayers = new ArrayList<>();
 
@@ -29,9 +30,20 @@ public class Game {
 
     static ExecutorService service = Executors.newFixedThreadPool(3);
 
-    public Game(ArrayList<Player> players) {
-        //this.rabbitClient.initializeConnection();
-        currentPlayers = players;
+    public Game(int playerNr, RabbitClient rabbitClient) throws IOException, ClassNotFoundException {
+        // read playerNr msg from the queue and create the players
+        for (int i = 0; i < playerNr; i++) {
+            RabbitMessage rm = (RabbitMessage) rabbitClient.consumeSync();
+            String playerName = rm.getPlayerName();
+            Player p = new Player(playerName);
+            currentPlayers.add(p);
+            loginUser(p);
+        }
+    }
+
+    public static String getRandomName() {
+        int generatedId = (int) ((Math.random() * (playerNames.length - 0)) + 0);
+        return playerNames[generatedId];
     }
 
     public void showGameRules() {
