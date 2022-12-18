@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,6 +28,8 @@ public class Game {
     private static final Lock gameLock = new ReentrantLock();
 
     public static final Lock playerLock = new ReentrantLock();
+
+    public static final Semaphore resourceSemaphore = new Semaphore(1);
 
     static ExecutorService service = Executors.newFixedThreadPool(3);
 

@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.System.exit;
 import static org.cebp.model.Game.playerLock;
+import static org.cebp.model.Game.resourceSemaphore;
 
 public class Player implements Runnable {
     private String username;    // used to identify players
@@ -53,13 +54,13 @@ public class Player implements Runnable {
     public void printPlayerResources() {
         Game.getPlayerLock().lock();
         try {
-        System.out.println("Player " + this.username + ": You currently have: ");
-        System.out.println(Resource.BRICK + " " + this.playerResources.get(Resource.BRICK).toString());
-        System.out.println(Resource.WOOD + " " + this.playerResources.get(Resource.WOOD).toString());
-        System.out.println(Resource.SHEEP + " " + this.playerResources.get(Resource.SHEEP).toString());
-        System.out.println(Resource.GRAIN + " " + this.playerResources.get(Resource.GRAIN).toString());
-        System.out.println(Resource.STONE + " " + this.playerResources.get(Resource.STONE).toString());
-        System.out.println();
+            System.out.println("Player " + this.username + ": You currently have: ");
+            System.out.println(Resource.BRICK + " " + this.playerResources.get(Resource.BRICK).toString());
+            System.out.println(Resource.WOOD + " " + this.playerResources.get(Resource.WOOD).toString());
+            System.out.println(Resource.SHEEP + " " + this.playerResources.get(Resource.SHEEP).toString());
+            System.out.println(Resource.GRAIN + " " + this.playerResources.get(Resource.GRAIN).toString());
+            System.out.println(Resource.STONE + " " + this.playerResources.get(Resource.STONE).toString());
+            System.out.println();
         } finally {
             playerLock.unlock();
         }
@@ -174,9 +175,9 @@ public class Player implements Runnable {
                 //if the resource the player wants to get is equal to the resource the other player wants to give
                 //then the exchange is made
                 if (wantedResource == player.getPlayerResourceToExchange()
-                    && toExchangeResource == player.getPlayerWantedResource()) {
+                        && toExchangeResource == player.getPlayerWantedResource()) {
                     this.getPlayerResources().put(wantedResource,
-                                                  this.getPlayerResources().get(wantedResource) + 1);
+                            this.getPlayerResources().get(wantedResource) + 1);
                     player.getPlayerResources().put(toExchangeResource, player.getPlayerResources().get(toExchangeResource) + 1);
                     exchangeMade.set(true);
                     exchangePartner.set(player.getUsername());
@@ -184,50 +185,89 @@ public class Player implements Runnable {
             }
         });
 
-        if (exchangeMade.get()){
+        if (exchangeMade.get()) {
             System.out.println(this.getUsername() + " exchanged " + wantedResource + " for " + toExchangeResource + " with " + exchangePartner.get());
         }
     }
 
     public void createResource(Resource wantedResource) {
         HashMap<Resource, Integer> playerResources = this.getPlayerResources();
-        if(playerResources != null) {
+        if (playerResources != null) {
             if (playerResources.get(Resource.SHEEP) < 1
-                || playerResources.get(Resource.GRAIN) < 1
-                || playerResources.get(Resource.STONE) < 1) {
+                    || playerResources.get(Resource.GRAIN) < 1
+                    || playerResources.get(Resource.STONE) < 1) {
                 System.out.println(this.username + " You don't have enough resources to create " +
-                                   wantedResource + ". Please check your resources.");
-                //to be implemented => if the player doesn't have enough resources,
-                // he will be redirected to the menu actions
+                        wantedResource + ". Please check your resources.");
             } else {
-                playerLock.lock();
-                try {
 
-                    HashMap<Resource, Integer> commonResources = Game.getCommonResources();
-                    removeResourcesInExchangeForAnotherResource(playerResources, commonResources);
+                HashMap<Resource, Integer> commonResources = Game.getCommonResources();
+                removeResourcesInExchangeForAnotherResource(playerResources, commonResources);
 
-                    switch (wantedResource) {
-                        case BRICK:
-                            if (commonResources.get(Resource.BRICK) > 0) {
-                                playerResources.put(Resource.BRICK, playerResources.get(Resource.BRICK) + 1);
-                                commonResources.put(Resource.BRICK, commonResources.get(Resource.BRICK) - 1);
-                                System.out.println("Brick resource created successfully for player: " + this.username);
-                            } else {
-                                System.out.println("There are no more bricks available for player: " + this.username);
-                                //todo get common resources available
+                switch (wantedResource) {
+                    case BRICK:
+                        if(this.playerResources.get(Resource.BRICK) < 1) {
+                            System.out.println("Waiting for semaphore's permit to take 1 Brick");
+                            try {
+                                resourceSemaphore.acquire();
+                                System.out.println("Brick acquire");
+                                Thread.sleep(20);
+                                if (commonResources.get(Resource.BRICK) > 0) {
+                                    removeResourcesInExchangeForAnotherResource(playerResources, commonResources);
+                                    playerResources.put(Resource.BRICK, playerResources.get(Resource.BRICK) + 1);
+                                    commonResources.put(Resource.BRICK, commonResources.get(Resource.BRICK) - 1);
+                                    System.out.println("Brick resource created successfully for player: " + this.username);
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                } else {
+                                    System.out.println("There is no more Brick available.");
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    resourceSemaphore.release();
+                                }
+                            } catch (InterruptedException exc) {
+                                System.out.println(exc);
                             }
-                        case WOOD:
-                            if (commonResources.get(Resource.WOOD) > 0) {
-                                playerResources.put(Resource.WOOD, playerResources.get(Resource.WOOD) + 1);
-                                commonResources.put(Resource.WOOD, commonResources.get(Resource.WOOD) - 1);
-                                System.out.println("Wood resource created successfully for player: " + this.username);
-                            } else {
-                                System.out.println("There is no more wood available for player: " + this.username);
-                                //todo get common resources available
+                            resourceSemaphore.release();
+                        }
+                        break;
+                    case WOOD:
+                        if(this.playerResources.get(Resource.WOOD) < 1) {
+                            System.out.println("Waiting for semaphore's permit to take 1 Wood");
+                            try {
+                                resourceSemaphore.acquire();
+                                System.out.println("Wood acquire");
+                                Thread.sleep(20);
+                                if (commonResources.get(Resource.WOOD) > 0) {
+                                    removeResourcesInExchangeForAnotherResource(playerResources, commonResources);
+                                    playerResources.put(Resource.WOOD, playerResources.get(Resource.WOOD) + 1);
+                                    commonResources.put(Resource.WOOD, commonResources.get(Resource.WOOD) - 1);
+                                    System.out.println("Wood resource created successfully for player: " + this.username);
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                } else {
+                                    System.out.println("There is no more Wood available.");
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    resourceSemaphore.release();
+                                }
+                            } catch (InterruptedException exc) {
+                                System.out.println(exc);
                             }
-                    }
-                } finally {
-                    playerLock.unlock();
+                            resourceSemaphore.release();
+                        }
+                        break;
                 }
             }
         }
@@ -398,19 +438,11 @@ public class Player implements Runnable {
                         break;
 
                     case 4:
-                        if (this.playerResources.get(Resource.WOOD) < 0) {
-                            this.createResource(Resource.WOOD);
-                        } else {
-                            continue;
-                        }
+                        this.createResource(Resource.WOOD);
                         break;
 
                     case 5:
-                        if (this.playerResources.get(Resource.BRICK) < 0) {
-                            this.createResource(Resource.BRICK);
-                        } else {
-                            continue;
-                        }
+                        this.createResource(Resource.BRICK);
                         break;
 
                     case 6:
