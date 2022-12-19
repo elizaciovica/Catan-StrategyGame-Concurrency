@@ -201,7 +201,6 @@ public class Player implements Runnable {
             } else {
 
                 HashMap<Resource, Integer> commonResources = Game.getCommonResources();
-                removeResourcesInExchangeForAnotherResource(playerResources, commonResources);
 
                 switch (wantedResource) {
                     case BRICK:
@@ -293,7 +292,6 @@ public class Player implements Runnable {
                 || playerResources.get(Resource.SHEEP) < 1) {
                 System.out.println(this.username + " You don't have enough resources to create a house. Please check your resources.");
                 System.out.println();
-                //todo if grain or sheep are not enough => made possible exchange ???
             } else {
                 playerLock.lock();
                 try {
@@ -308,8 +306,6 @@ public class Player implements Runnable {
                     System.out.println("Player " + this.username + " you have " + this.cities + " cities");
                     System.out.println();
 
-                    //just to test it
-                    //todo check for the points
                     if (this.points >= 20) {
                         System.out.println("Player: " + this.username + " won the Game");
                         Game.stopExecutor();
@@ -353,8 +349,6 @@ public class Player implements Runnable {
                 if (playerResources.get(Resource.GRAIN) < 2 || playerResources.get(Resource.STONE) < 3) {
                     System.out.println(this.username + " You don't have enough resources to create a city. Please check your resources.");
                     System.out.println();
-                    //to be implemented => if the player doesn't have enough resources,
-                    // he will be redirected to the menu actions
                 } else {
                     removeResourcesInExchangeForCity(playerResources, commonResources);
                     this.increaseNoOfCities();
@@ -366,8 +360,6 @@ public class Player implements Runnable {
                     System.out.println("Player " + this.username + " you have " + this.cities + " cities");
                     System.out.println();
 
-                    //just to test it
-                    //todo check for the points
                     if (this.points >= 20) {
                         System.out.println("Player: " + this.username + " won the Game");
                         Game.stopExecutor();
@@ -423,7 +415,6 @@ public class Player implements Runnable {
                         this.createCity();
 
                     case 3:
-                        //todo maybe sync??
                         if (this.playerResources.get(Resource.GRAIN) < 3 ||
                             this.playerResources.get(Resource.SHEEP) < 2 ||
                             this.playerResources.get(Resource.STONE) < 3) {

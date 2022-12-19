@@ -2,12 +2,9 @@ package org.cebp;
 
 
 import org.cebp.model.Game;
-import org.cebp.model.Player;
 import org.cebp.rabbit.RabbitClient;
 import org.cebp.rabbit.RabbitMessage;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
 public class Main {
